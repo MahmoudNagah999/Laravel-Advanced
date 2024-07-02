@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Events\newProductMail;
+use Illuminate\Support\Facades\Event;
 
 class productsService{
     
@@ -15,7 +17,10 @@ class productsService{
     }
 
     public function createProduct(array $data){
-        return Product::create($data);
+        $product = Product::create($data);
+        $product->details()->create($data);
+        Event::dispatch(new newProductMail($product));
+        return $product;
     }
 
     public function updateProduct($id, array $data){
